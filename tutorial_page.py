@@ -284,8 +284,10 @@ Builder.load_string("""
             on_press: 
                 root.manager.current = 'menu'
                 root.manager.transition.direction = 'left'
+                video_display.state = "pause"
 
         VideoPlayer:
+            id: video_display
             source: "./hunter.mp4"
             width: 100.0
 
