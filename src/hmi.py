@@ -15,7 +15,9 @@ from screens.intro_tutorial import IntroVideoScreen
 
 from kivy.uix.popup import Popup
 
+
 import json
+
 
 
 class HMIApp(App):
@@ -64,10 +66,10 @@ class HMIApp(App):
     '''
     def build(self):
 
-        # get settings
         self.getSettings()
         
-        # Create the screen manager        
+        # Create the screen manager
+        
         self.sm.add_widget(CarHomeScreen(name='car_main_menu'))
         self.sm.add_widget(Dashboard(name='dashboard'))
         self.sm.add_widget(SettingsScreen(name='settings'))
