@@ -88,6 +88,7 @@ class HMIApp(App):
     # closes congrats pop up and returns to main menu
     def closeCongratsPopUpWindow(self):
         self.congratsPopUpWindow.dismiss()
+        self.sm.transition.direction = 'right'
         self.sm.current = 'car_main_menu'
 
     # get volume
@@ -197,26 +198,6 @@ class HMIApp(App):
             return [0,1,0,1]
         return [1,1,1,1]
 
-
-    # Reads variable from settings json
-    # def getValue(self, vtype, key):
-    #     with open('storage.json') as f:
-    #         data = json.load(f)
-    #         f.close()
-    #         return data[vtype][key]
-
-    
-    # Writes variable to settings json    
-    # def setValue(self, vtype, key, value):
-    #     data = ''
-    #     with open('storage.json') as f:
-    #         data = json.load(f)
-    #         f.close()
-    #         data[vtype][key] = value
-
-    #     with open('storage.json', 'w') as f:
-    #         json.dump(data, f)
-    #         f.close()
 
 if __name__ == '__main__':
     HMIApp.title = "Lane Centering"
