@@ -220,4 +220,5 @@ class HMIApp(App):
 
 if __name__ == '__main__':
     HMIApp.title = "Lane Centering"
+    Window.fullscreen = True
     HMIApp().run()
