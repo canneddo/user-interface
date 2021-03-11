@@ -16,7 +16,7 @@ Builder.load_string("""
             text: 'Skip'
             on_press:
                 intro_video_player.state = 'stop'
-                root.manager.transition.direction = 'left' 
+                root.manager.transition.direction = 'right' 
                 root.manager.current = 'car_main_menu'
                 
 

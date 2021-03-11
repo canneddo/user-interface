@@ -16,7 +16,7 @@ Builder.load_string("""
             text: 'Back'
             on_press:
                 video_player.state = 'stop'
-                root.manager.transition.direction = 'left' 
+                root.manager.transition.direction = 'right' 
                 root.manager.current = 'tutorial'
                 
 

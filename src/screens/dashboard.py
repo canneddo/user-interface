@@ -41,6 +41,7 @@ Builder.load_string("""
                 size_hint: None, None
                 text: 'Park'
                 on_press:
+                    root.manager.transition.direction = 'left'
                     root.manager.current = 'car_main_menu'
             Button:
                 id: lane_centering
@@ -132,7 +133,7 @@ Builder.load_string("""
             Image:
                 id: vehicle
                 opacity: 0
-                source: 'images/blazer.png'
+                source: 'images/car.png'
 
             Button:
                 id: right_lane
@@ -153,38 +154,58 @@ Builder.load_string("""
             
 
         GridLayout:
-            cols: 3
+            cols: 5
             height: root.height * 0.8
             Label:
                 text: "Volume"
-            Slider:
-                id: volume_slider
-                min: 0
-                max: 100
-                value: app.getVolume()
-                value_track: True
-                value_track_color: [0,100,200,1]
-                step: 5
-                orientation: 'horizontal'
-                on_touch_up: app.setVolume(int(volume_slider.value))
+                font_size: 20
+            CheckBox:
+                active: True
+                disabled: True
+            Button:
+                id: volume_down
+                text: "-"
+                font_size: 60
+                on_release: 
+                    app.setVolume(int(volumeVal.text) - 5 if int(volumeVal.text) > 0 else int(volumeVal.text))  
             Label:
-                text: str(int(volume_slider.value))
+                id: volumeVal
+                text: app.volume
+                font_size: 30
+            Button:
+                id: volume_up
+                text: "+"
+                font_size: 60
+                on_release: 
+                    app.setVolume(int(volumeVal.text) + 5 if int(volumeVal.text) < 100 else int(volumeVal.text))
 
             Label:
                 text: "LED Brightness"
-            Slider:
-                id: led_brightness_slider
-                min: 0
-                max: 100
-                value: app.getLedBrightness()
-                value_track: True
-                value_track_color: [0,100,200,1]
-                step: 5
-                orientation: 'horizontal'
-                on_touch_up: 
-                    app.setLedBrightness(int(led_brightness_slider.value))
+                font_size: 20
+            CheckBox:
+                id: led_brightness_active
+                active: app.ledBrightnessEnabled
+                on_release:
+                    app.enableLedBrightness(led_brightness_active.active)
+            Button:
+                id: led_brightness_down
+                disabled: not led_brightness_active.active
+                text: "-"
+                font_size: 60
+                on_release: 
+                    app.setLedBrightness(int(ledBrightnessVal.text) - 5 if int(ledBrightnessVal.text) > 0 else 0)  
             Label:
-                text: str(int(led_brightness_slider.value))
+                id: ledBrightnessVal
+                text: app.ledBrightness
+                font_size: 30
+            Button:
+                id: led_brightness_up
+                disabled: not led_brightness_active.active
+                text: "+"
+                font_size: 60
+                on_release: 
+                    app.setLedBrightness(int(ledBrightnessVal.text) + 5 if int(ledBrightnessVal.text) < 100 else 100)
+            
 """)
 
 class Dashboard(Screen):

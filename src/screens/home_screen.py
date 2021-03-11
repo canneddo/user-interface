@@ -30,7 +30,9 @@ Builder.load_string("""
         Image:
             source: '{0}'
             size_hint: 0.2,0.2
-            on_touch_down: root.manager.current = 'menu'
+            on_touch_down: 
+                root.manager.transition.direction = 'left'
+                root.manager.current = 'menu'
         Image:
             source: '{1}'
             size_hint: 0.2,0.2
@@ -53,7 +55,7 @@ Builder.load_string("""
             size_hint: 0.2,0.2
             text: 'Shift out of Park'
             on_press:
-                root.manager.transition.direction = 'left' 
+                root.manager.transition.direction = 'right' 
                 root.manager.current = 'dashboard'
 """.format(*image_paths))
 

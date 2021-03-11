@@ -22,7 +22,7 @@ Builder.load_string("""
         size_hint: 0.4, 0.3
         pos_hint: {"x":0.1, "y": 0.1}
         on_release:
-            app.closePopUpWindow()
+            app.closeFTDPopUpWindow()
             
 
     Button:

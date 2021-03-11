@@ -22,7 +22,7 @@ Builder.load_string("""
             width: '192dp'
             text: 'Back'
             on_press:
-                root.manager.transition.direction = 'left' 
+                root.manager.transition.direction = 'right' 
                 root.manager.current = 'menu'
 
 <CStackLayout@StackLayout+BackgroundColor>
