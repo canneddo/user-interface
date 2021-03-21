@@ -55,6 +55,7 @@ Builder.load_string("""
             size_hint: 0.2,0.2
             text: 'Shift out of Park'
             on_press:
+                app.playButtonTone()
                 root.manager.transition.direction = 'right' 
                 root.manager.current = 'dashboard'
 """.format(*image_paths))

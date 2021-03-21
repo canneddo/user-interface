@@ -13,6 +13,7 @@ Builder.load_string("""
             width: '192dp'
             text: 'Settings'
             on_press:
+                app.playButtonTone()
                 root.manager.transition.direction = 'left' 
                 root.manager.current = 'settings'
         Button:
@@ -22,6 +23,7 @@ Builder.load_string("""
             width: '192dp'
             text: 'Tutorials'
             on_press: 
+                app.playButtonTone()
                 root.manager.transition.direction = 'left'
                 root.manager.current = 'tutorial'
         Button:
@@ -31,6 +33,7 @@ Builder.load_string("""
             width: '192dp'
             text: 'Back'
             on_press:
+                app.playButtonTone()
                 root.manager.transition.direction = 'right'
                 root.manager.current = 'car_main_menu'
 

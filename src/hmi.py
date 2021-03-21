@@ -1,5 +1,6 @@
 from kivy.app import App
 from kivy.uix.screenmanager import ScreenManager
+from kivy.core.audio import SoundLoader
 from kivy.core.window import Window
 from kivy.clock import Clock
 from kivy.properties import StringProperty
@@ -198,6 +199,9 @@ class HMIApp(App):
             return [0,1,0,1]
         return [1,1,1,1]
 
+    def playButtonTone(self):
+        tone = SoundLoader.load('sounds/tone.mp3')
+        tone.play()
 
 if __name__ == '__main__':
     HMIApp.title = "Lane Centering"

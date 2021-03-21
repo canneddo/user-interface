@@ -13,6 +13,7 @@ Builder.load_string("""
             width: '192dp'
             text: 'Lane Centering Tutorial'
             on_press:
+                app.playButtonTone()
                 root.manager.current = 'video'
                 app.playBack(False)
         Button:
@@ -22,6 +23,7 @@ Builder.load_string("""
             width: '192dp'
             text: 'Back'
             on_press:
+                app.playButtonTone()
                 root.manager.transition.direction = 'right' 
                 root.manager.current = 'menu'
 
