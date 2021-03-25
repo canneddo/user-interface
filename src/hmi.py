@@ -201,6 +201,7 @@ class HMIApp(App):
 
     def playButtonTone(self):
         tone = SoundLoader.load('sounds/tone.mp3')
+        tone.volume = int(self.getVolume())
         tone.play()
 
 if __name__ == '__main__':

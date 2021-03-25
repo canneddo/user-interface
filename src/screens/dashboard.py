@@ -14,6 +14,7 @@ Builder.load_string("""
                 size_hint: None, None
                 text: '***Left Side LEDs***'
                 on_press:
+                    app.playButtonTone()
                     left_led.background_color = [1,0,1,1]
                     center_led.background_color = [1,1,1,1]
                     right_led.background_color = [1,1,1,1]
@@ -24,6 +25,7 @@ Builder.load_string("""
                 size_hint: None, None
                 text: '***Center LEDs***'
                 on_press:
+                    app.playButtonTone()
                     center_led.background_color = [1,0,1,1]
                     left_led.background_color = [1,1,1,1]
                     right_led.background_color = [1,1,1,1]
@@ -33,6 +35,7 @@ Builder.load_string("""
                 size_hint: None, None
                 text: '***Right Side LEDs***'
                 on_press:
+                    app.playButtonTone()
                     right_led.background_color = [1,0,1,1]
                     left_led.background_color = [1,1,1,1]
                     center_led.background_color = [1,1,1,1]
@@ -41,6 +44,7 @@ Builder.load_string("""
                 size_hint: None, None
                 text: 'Park'
                 on_press:
+                    app.playButtonTone()
                     root.manager.transition.direction = 'left'
                     root.manager.current = 'car_main_menu'
             Button:
@@ -50,6 +54,7 @@ Builder.load_string("""
                 text: 'Lane Centering'
                 background_color: 'white'
                 on_press:
+                    app.playButtonTone()
                     self.background_color = [0,1,0,1] if self.background_color == [1,1,1,1] and d_error.background_color == [1,1,1,1] else [1,1,1,1]
                     left_lane.opacity = 1 if left_lane.opacity == 0 and d_error.background_color == [1,1,1,1] else 0
                     left_lane.disabled = False if left_lane.disabled and d_error.background_color == [1,1,1,1] else True                    
@@ -62,6 +67,7 @@ Builder.load_string("""
                 size_hint: None, None
                 text: 'Simulate Error'
                 on_press:
+                    app.playButtonTone()
                     self.background_color = [1,1,1,1] if self.background_color == [1,0,0,1] else [1,0,0,1]
                     # On Error, disable lane centering, restore defaults and turn off displays
                     lane_centering.background_color = [1,1,1,1]
@@ -77,7 +83,9 @@ Builder.load_string("""
                 size: root.width * 0.34, root.height * 0.05
                 id: d_decelerate
                 text: "Decrease Speed"
-                on_press: d_speed.text = str(int(d_speed.text) - 5) if int(d_speed.text) > 0 else str(int(d_speed.text))
+                on_press:
+                    app.playButtonTone()
+                    d_speed.text = str(int(d_speed.text) - 5) if int(d_speed.text) > 0 else str(int(d_speed.text))
             Label:
                 width: root.width * 0.34
                 id: d_speed
@@ -87,7 +95,9 @@ Builder.load_string("""
                 size: root.width * 0.34, root.height * 0.05
                 id: d_accelerate
                 text: 'Increase Speed'
-                on_press: d_speed.text = str(int(d_speed.text) + 5) if int(d_speed.text) < 100 else str(int(d_speed.text))
+                on_press:
+                    app.playButtonTone()
+                    d_speed.text = str(int(d_speed.text) + 5) if int(d_speed.text) < 100 else str(int(d_speed.text))
             
 
 
@@ -127,7 +137,8 @@ Builder.load_string("""
                 size: 10, 150
                 size_hint: None, None
                 background_color: [1,1,1,1]
-                on_press: 
+                on_press:
+                    app.playButtonTone()
                     self.background_color = app.changeLaneColor(self.background_color)
 
             Image:
@@ -143,7 +154,9 @@ Builder.load_string("""
                 pos: (0,0)
                 size_hint: None, None
                 background_color: [1,1,1,1]
-                on_press: self.background_color = app.changeLaneColor(self.background_color)
+                on_press:
+                    app.playButtonTone()
+                    self.background_color = app.changeLaneColor(self.background_color)
 
             Button:
                 size: 100, 100
@@ -166,7 +179,8 @@ Builder.load_string("""
                 id: volume_down
                 text: "-"
                 font_size: 60
-                on_release: 
+                on_release:
+                    app.playButtonTone()
                     app.setVolume(int(volumeVal.text) - 5 if int(volumeVal.text) > 0 else int(volumeVal.text))  
             Label:
                 id: volumeVal
@@ -176,7 +190,8 @@ Builder.load_string("""
                 id: volume_up
                 text: "+"
                 font_size: 60
-                on_release: 
+                on_release:
+                    app.playButtonTone()
                     app.setVolume(int(volumeVal.text) + 5 if int(volumeVal.text) < 100 else int(volumeVal.text))
 
             Label:
@@ -186,13 +201,15 @@ Builder.load_string("""
                 id: led_brightness_active
                 active: app.ledBrightnessEnabled
                 on_release:
+                    app.playButtonTone()
                     app.enableLedBrightness(led_brightness_active.active)
             Button:
                 id: led_brightness_down
                 disabled: not led_brightness_active.active
                 text: "-"
                 font_size: 60
-                on_release: 
+                on_release:
+                    app.playButtonTone()
                     app.setLedBrightness(int(ledBrightnessVal.text) - 5 if int(ledBrightnessVal.text) > 0 else 0)  
             Label:
                 id: ledBrightnessVal
@@ -203,7 +220,8 @@ Builder.load_string("""
                 disabled: not led_brightness_active.active
                 text: "+"
                 font_size: 60
-                on_release: 
+                on_release:
+                    app.playButtonTone()
                     app.setLedBrightness(int(ledBrightnessVal.text) + 5 if int(ledBrightnessVal.text) < 100 else 100)
             
 """)

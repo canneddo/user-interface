@@ -31,6 +31,7 @@ Builder.load_string("""
             source: '{0}'
             size_hint: 0.2,0.2
             on_touch_down: 
+                app.playButtonTone()
                 root.manager.transition.direction = 'left'
                 root.manager.current = 'menu'
         Image:

@@ -18,6 +18,7 @@ Builder.load_string("""
         size_hint: 0.4, 0.3
         pos_hint: {"x":0.3, "y": 0.1}
         on_release:
+            app.playButtonTone()
             app.closeCongratsPopUpWindow()
 
 """)
