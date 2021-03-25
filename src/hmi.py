@@ -4,6 +4,7 @@ from kivy.core.audio import SoundLoader
 from kivy.core.window import Window
 from kivy.clock import Clock
 from kivy.properties import StringProperty
+from kivy.uix.popup import Popup
 
 # import screens
 from screens.home_screen import CarHomeScreen
@@ -19,7 +20,9 @@ from screens.popups.settings_popup import SettingsPopUp
 from screens.popups.ftd_popup import FTDPopUp
 from screens.popups.congrats_popup import CongratsPopUp
 
-from kivy.uix.popup import Popup
+import sys
+sys.path.insert(0, '../../Led-Module')
+from LEDModuleLibraryV2 import LEDStrip
 
 from time import sleep
 import json
@@ -33,7 +36,7 @@ class HMIApp(App):
     ledBrightnessEnabled = True
 
     # when intro video should be paused and settings pop-up displayed
-    SETTINGS_POPUP_TIME = 10
+    SETTINGS_POPUP_TIME = 67
 
     # popup windows
     ftdPopupWindow = None
@@ -43,15 +46,31 @@ class HMIApp(App):
     # screen manager
     sm = ScreenManager()
 
+    # LED Strip
+    strip = LEDStrip()
+
     '''
     Begins playback of video
     @param intro: True if intro video, False if accessed from menu
     '''
-    def playBack(self, intro):
-        video = 'intro_video' if intro else 'video'
+    def playTutorial(self, intro):
+
+        video = None
+        if (intro):
+            self.closeFTDPopUpWindow()
+            video = 'intro_video'
+        else:
+            video = 'video' 
+        
+        # specify transition screen and direction
+        self.sm.transition.direction = 'left' 
+        self.sm.current = video
+
+        # get player and play
         player = self.getPlayer(video)
         player.state = 'play'
 
+        # if intro, schedule pop-ups
         if (intro):
             Clock.schedule_once(lambda dt: self.openSettingsPopUpWindow(player))
             Clock.schedule_once(lambda dt: self.openCongratsPopUpWindow(player))
@@ -102,13 +121,12 @@ class HMIApp(App):
 
     # Sets volume for settings slider value
     def setVolume(self, volume):
-        self.volume = str(volume)
-        # self.sm.get_screen('settings').ids.volume_slider.value = volume        
+        self.volume = str(volume)      
 
     # Sets brightness for settings slider value
     def setLedBrightness(self, brightness):
         self.ledBrightness = str(brightness)
-        # self.sm.get_screen('settings').ids.led_brightness_slider.value = brightness
+        self.strip.change_brightness(int(2.55*brightness))
 
     # Sets boolean status of led brightness 
     def enableLedBrightness(self, status):
@@ -142,15 +160,6 @@ class HMIApp(App):
     # closes first time driver pop-up window
     def closeFTDPopUpWindow(self):
         self.ftdPopupWindow.dismiss()
-
-    '''
-    closes first time driver pop-up window
-    switches to introductory video screen
-    ''' 
-    def playIntroTutorial(self):
-        self.closeFTDPopUpWindow()
-        self.sm.current = 'intro_video'
-        self.playBack(True)
 
     '''
     Runs when application closes
@@ -201,10 +210,11 @@ class HMIApp(App):
 
     def playButtonTone(self):
         tone = SoundLoader.load('sounds/tone.mp3')
-        tone.volume = int(self.getVolume())
+        tone.volume = int(self.getVolume())/100
         tone.play()
 
 if __name__ == '__main__':
     HMIApp.title = "Lane Centering"
     Window.fullscreen = True
+    Window.size = (800,480)
     HMIApp().run()
