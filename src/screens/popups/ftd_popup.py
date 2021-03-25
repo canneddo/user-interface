@@ -32,10 +32,9 @@ Builder.load_string("""
         font_size: 20
         size_hint: 0.4, 0.3
         pos_hint: {"x":0.5, "y": 0.1}
-        on_release: 
-            app.playButtonTone()
-            app.playIntroTutorial()
-            # intro_video_player.state = 'play'
+        on_release:
+            app.playButtonTone() 
+            app.playTutorial(True)
 
 """)
 
