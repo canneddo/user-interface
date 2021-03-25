@@ -7,40 +7,9 @@ Builder.load_string("""
         cols: 1
         size: root.width, root.height
         GridLayout:
-            cols: 3
+            cols: 5
             Button:
-                id: left_led
-                size: root.width * 0.34, root.height * 0.05
-                size_hint: None, None
-                text: '***Left Side LEDs***'
-                on_press:
-                    app.playButtonTone()
-                    left_led.background_color = [1,0,1,1]
-                    center_led.background_color = [1,1,1,1]
-                    right_led.background_color = [1,1,1,1]
-            Button:
-                id: center_led
-                size: root.width * 0.34, root.height * 0.05
-                background_color: [1,0,1,1]
-                size_hint: None, None
-                text: '***Center LEDs***'
-                on_press:
-                    app.playButtonTone()
-                    center_led.background_color = [1,0,1,1]
-                    left_led.background_color = [1,1,1,1]
-                    right_led.background_color = [1,1,1,1]
-            Button:
-                id: right_led
-                size: root.width * 0.34, root.height * 0.05
-                size_hint: None, None
-                text: '***Right Side LEDs***'
-                on_press:
-                    app.playButtonTone()
-                    right_led.background_color = [1,0,1,1]
-                    left_led.background_color = [1,1,1,1]
-                    center_led.background_color = [1,1,1,1]
-            Button:
-                size: root.width * 0.34, root.height * 0.05
+                size: root.width * 0.2, root.height * 0.05
                 size_hint: None, None
                 text: 'Park'
                 on_press:
@@ -49,7 +18,7 @@ Builder.load_string("""
                     root.manager.current = 'car_main_menu'
             Button:
                 id: lane_centering
-                size: root.width * 0.34, root.height * 0.05
+                size: root.width * 0.2, root.height * 0.05
                 size_hint: None, None
                 text: 'Lane Centering'
                 background_color: 'white'
@@ -63,7 +32,7 @@ Builder.load_string("""
                     vehicle.opacity = 1 if vehicle.opacity == 0 and d_error.background_color == [1,1,1,1] else 0
             Button:
                 id: d_error
-                size: root.width * 0.34, root.height * 0.05
+                size: root.width * 0.2, root.height * 0.05
                 size_hint: None, None
                 text: 'Simulate Error'
                 on_press:
@@ -80,29 +49,57 @@ Builder.load_string("""
                     vehicle.opacity = 0
 
             Button:
-                size: root.width * 0.34, root.height * 0.05
+                size: root.width * 0.2, root.height * 0.05
                 id: d_decelerate
+                size_hint: None, None
                 text: "Decrease Speed"
                 on_press:
-                    app.playButtonTone()
+                    app.playButtonTone() 
                     d_speed.text = str(int(d_speed.text) - 5) if int(d_speed.text) > 0 else str(int(d_speed.text))
-            Label:
-                width: root.width * 0.34
-                id: d_speed
-                font_size: 40
-                text: "0"
             Button:
-                size: root.width * 0.34, root.height * 0.05
+                size: root.width * 0.2, root.height * 0.05
                 id: d_accelerate
+                size_hint: None, None
                 text: 'Increase Speed'
                 on_press:
-                    app.playButtonTone()
+                    app.playButtonTone()  
                     d_speed.text = str(int(d_speed.text) + 5) if int(d_speed.text) < 100 else str(int(d_speed.text))
-            
+            Button:
+                size: root.width * 0.2, root.height * 0.1
+                size_hint: None, None
+                background_color: [0,0,0,0]
+                disabled: True
+                opacity: 0
+            Button:
+                size: root.width * 0.2, root.height * 0.1
+                size_hint: None, None
+                background_color: [0,0,0,0]
+                disabled: True
+                opacity: 0
+            Label:
+                size: root.width * 0.2, root.height * 0.1
+                size_hint: None, None
+                id: d_speed
+                font_size: 40
+                text: "0" 
+            Button:
+                size: root.width * 0.2, root.height * 0.1
+                size_hint: None, None
+                background_color: [0,0,0,0]
+                disabled: True
+                opacity: 0
+            Button:
+                size: root.width * 0.2, root.height * 0.1
+                size_hint: None, None
+                background_color: [0,0,0,0]
+                disabled: True
+                opacity: 0
 
 
         GridLayout:
             cols: 1
+            row_force_default: True
+            row_default_height: 0
             Label:
                 id: labelActive
                 text: "Lane Centering Active"
@@ -117,15 +114,17 @@ Builder.load_string("""
                 opacity: 1 if ((lane_centering.background_color == [0,1,0,1]) and (d_error.background_color == [1,1,1,1]) and not ((int(d_speed.text) >= 60) and (left_lane.background_color == [0,1,0,1]) and (right_lane.background_color == [0,1,0,1]))) else 0
             Label:
                 id: labelConnectionLost
-                text: "Connection to Lane Centering Lost"
+                text: "Error: \\nLane Centering has been compromised,\\ncontinue driving normally."
                 font_size: 30
                 color: "red"
                 opacity: 1 if d_error.background_color == [1,0,0,1] else 0
         
         GridLayout:
             cols: 5
+            row_force_default: True
+            row_default_height: 140
             Button:
-                size: 100, 100
+                size: 100, 140
                 background_color: [0,0,0,0]
                 disabled: True
                 opacity: 0
@@ -134,7 +133,7 @@ Builder.load_string("""
                 id: left_lane
                 opacity: 0
                 disabled: True
-                size: 10, 150
+                size: 10, 140
                 size_hint: None, None
                 background_color: [1,1,1,1]
                 on_press:
@@ -150,7 +149,7 @@ Builder.load_string("""
                 id: right_lane
                 opacity: 0
                 disabled: True
-                size: 10, 150
+                size: 10, 140
                 pos: (0,0)
                 size_hint: None, None
                 background_color: [1,1,1,1]
@@ -159,7 +158,7 @@ Builder.load_string("""
                     self.background_color = app.changeLaneColor(self.background_color)
 
             Button:
-                size: 100, 100
+                size: 100, 140
                 background_color: [0,0,0,0]
                 disabled: True
                 opacity: 0
@@ -168,7 +167,7 @@ Builder.load_string("""
 
         GridLayout:
             cols: 5
-            height: root.height * 0.8
+            height: root.height * 0.6            
             Label:
                 text: "Volume"
                 font_size: 20
@@ -180,8 +179,8 @@ Builder.load_string("""
                 text: "-"
                 font_size: 60
                 on_release:
-                    app.playButtonTone()
-                    app.setVolume(int(volumeVal.text) - 5 if int(volumeVal.text) > 0 else int(volumeVal.text))  
+                    app.setVolume(int(volumeVal.text) - 5 if int(volumeVal.text) > 0 else int(volumeVal.text))
+                    app.playButtonTone()   
             Label:
                 id: volumeVal
                 text: app.volume
@@ -191,8 +190,8 @@ Builder.load_string("""
                 text: "+"
                 font_size: 60
                 on_release:
-                    app.playButtonTone()
                     app.setVolume(int(volumeVal.text) + 5 if int(volumeVal.text) < 100 else int(volumeVal.text))
+                    app.playButtonTone() 
 
             Label:
                 text: "LED Brightness"
