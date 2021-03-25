@@ -14,8 +14,7 @@ Builder.load_string("""
             text: 'Lane Centering Tutorial'
             on_press:
                 app.playButtonTone()
-                root.manager.current = 'video'
-                app.playBack(False)
+                app.playTutorial(False)
         Button:
             size_hint_y: None
             size_hint_x: None
