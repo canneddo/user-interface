@@ -23,7 +23,7 @@ Builder.load_string("""
 
         VideoPlayer:
             id: video_player
-            source: "tutorial/tutorial_rev0.mp4"
+            source: "tutorial/tutorial_rev1.mp4"
             width: 100.0
 
 <CGridLayout@GridLayout+BackgroundColor>
