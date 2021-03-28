@@ -1,0 +1,6 @@
+#:kivy 1.0
+
+<LaneSliders>
+    on_lane_parameters: InputHandler.set_lane_parameters(self.lane_name, self.lane_parameters)
+    BoxLayout:
+        orientation: 'vertical'

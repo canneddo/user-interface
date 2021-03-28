@@ -1,0 +1,34 @@
+#:kivy 1.10.0
+
+#:include force lanedisplay.kv
+#:include force lanesliders.kv
+#:include gearshift.kv
+#:include speedyawadjust.kv
+#:include lanecenteringstatus.kv
+#:include sliderinput.kv
+#: import InputHandler __main__.input_handler
+
+#:set slider_min 0
+#:set slider_max 10
+#:set slider_step 1
+
+BoxLayout:
+    orientation: 'vertical'
+    BoxLayout:
+        orientation: 'horizontal'
+        LaneSliders:
+            label: 'Left Lane Controls'
+            lane_name: 'Left_Lane_A'
+            get_lane_parameters: InputHandler.get_lane_parameters('Left_Lane_A') # get the list of lane parameters
+        LaneDisplay:
+        LaneSliders:
+            label: 'Right Lane Controls'
+            lane_name: 'Right_Lane_A'
+            get_lane_parameters: InputHandler.get_lane_parameters('Right_Lane_A') # get the list of lane parameters
+    BoxLayout:
+        orientation: 'horizontal'
+        size_hint_y: None
+        height: 200
+        GearShift:
+        SpeedYawAdjust:
+        LaneCenteringStatus:

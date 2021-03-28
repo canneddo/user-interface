@@ -1,0 +1,26 @@
+#:kivy 1.10.0
+
+#:include sliderinput.kv
+
+<SpeedYawAdjust>
+    orientation: 'vertical'
+    on_speed: InputHandler.update_input('speed', self.speed)
+    on_yaw_rate: InputHandler.update_input('yaw_rate', self.yaw_rate)
+    SliderInput:
+        labeltext: 'speed'
+        labelwidth: 80
+        value_min: 0
+        value_max: 220
+        on_value: root.speed_update(self.value)
+    Widget:
+        height:50
+        size_hint_y: None
+    SliderInput:
+        labeltext: 'Yaw rate\nyaw_rate'
+        labelwidth: 80
+        value_min: -180
+        value_max: 180
+        on_value: root.yaw_update(self.value)
+    Widget:
+        height:50
+        size_hint_y: None

@@ -1,0 +1,25 @@
+#:kivy 1.10.0
+
+<GearShift>
+    orientation: 'vertical'
+    width: 100
+    size_hint_x: None
+    padding: 5
+    on_car_on: InputHandler.update_input('vehicle_on', int(self.car_on))
+    on_shifter_position: InputHandler.update_input('shifter_position', int(self.shifter_position))
+    Button:
+        text: 'P'
+        on_press: root.gear_button_press(0, self)
+        background_color: root.button_colors['green']
+    Button:
+        text: 'R'
+        on_press: root.gear_button_press(1, self)
+    Button:
+        text: 'N'
+        on_press: root.gear_button_press(2, self)
+    Button:
+        text: 'D'
+        on_press: root.gear_button_press(3, self)
+    Button:
+        text: 'L'
+        on_press: root.gear_button_press(4, self)
