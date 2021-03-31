@@ -5,15 +5,13 @@ import os
 from threading import Thread
 
 class Transmitter:
-    def __init__(self, can_bus, vcan=False):
+    def __init__(self, can_bus, can_db_fp='CAVs_HMI.dbc', vcan=False):
         if vcan:
             os.system('sudo modprobe vcan')
             os.system('sudo ip link add dev ' + can_bus + ' type vcan')
             os.system('sudo ip link set ' + can_bus + ' up type vcan')
-        else:
-            os.system('sudo ip link set ' + can_bus + ' up type can bitrate 1000000')
         self._can_bus = can.interface.Bus(can_bus, bustype='socketcan')
-        self._db = cantools.database.load_file('CAVs_HMI.dbc')
+        self._db = cantools.database.load_file(can_db_fp)
         self._periodic_sender = None
 
     def get_message_definition(self, message_name):

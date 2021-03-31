@@ -1,3 +1,5 @@
+import sys
+
 from transmit import Transmitter
 from messages import Left_Lane_A, Right_Lane_A, Vehicle_Info
 
@@ -41,9 +43,16 @@ class InputHandler():
             'Left_Lane_A': {'lane_curvature_derivative': 0, 'lane_curvature': 0, 'lane_heading': 0, 'distance_to_lane': 0},
             'Right_Lane_A': {'lane_curvature_derivative': 0, 'lane_curvature': 0, 'lane_heading': 0, 'distance_to_lane': 0}
         }
-        self.vehicle_info = MsgTransmitter(Transmitter('vcan0', True), 'Vehicle_Info')
-        self.left_lane_a = MsgTransmitter(Transmitter('vcan0', True), 'Left_Lane_A')
-        self.right_lane_a = MsgTransmitter(Transmitter('vcan0', True), 'Right_Lane_A')
+        can_bus = 'vcan0'
+        can_db_fp = 'CAVs_HMI.dbc'
+        virtual_can = True
+        if len(sys.argv[1:]) > 0:
+            can_bus = sys.argv[1:][0]
+            can_db_fp = sys.argv[1:][1]
+            virtual_can = False
+        self.vehicle_info = MsgTransmitter(Transmitter(can_bus, can_db_fp, virtual_can), 'Vehicle_Info')
+        self.left_lane_a = MsgTransmitter(Transmitter(can_bus, can_db_fp, virtual_can), 'Left_Lane_A')
+        self.right_lane_a = MsgTransmitter(Transmitter(can_bus, can_db_fp, virtual_can), 'Right_Lane_A')
         self.vehicle_info.start(self.get_inputs())
         self.left_lane_a.start(self.get_lane_parameters('Left_Lane_A'))
         self.right_lane_a.start(self.get_lane_parameters('Right_Lane_A'))
