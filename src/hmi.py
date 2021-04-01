@@ -3,7 +3,8 @@ from kivy.uix.screenmanager import ScreenManager
 from kivy.core.audio import SoundLoader
 from kivy.core.window import Window
 from kivy.clock import Clock
-from kivy.properties import StringProperty
+from kivy.properties import NumericProperty, StringProperty
+from kivy.event import EventDispatcher
 from kivy.uix.popup import Popup
 
 # import screens
@@ -15,25 +16,54 @@ from screens.settings_screen import SettingsScreen
 from screens.menu_screen import MenuScreen
 from screens.intro_tutorial import IntroVideoScreen
 
+from receive import Receiver
+
 # pop up windows
 from screens.popups.settings_popup import SettingsPopUp
 from screens.popups.ftd_popup import FTDPopUp
 from screens.popups.congrats_popup import CongratsPopUp
 
-import sys
-sys.path.insert(0, '../../Led-Module')
+import sys, os
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'Led-Module'))
 from LEDModuleLibraryV2 import LEDStrip
 
 from time import sleep
+from threading import Thread
 import json
 
+class VehicleInfoClass(EventDispatcher):
+    # vehicle info settings
+    vehicleOn = NumericProperty(0)
+    leftLaneDetected = NumericProperty(0)
+    rightLaneDetected = NumericProperty(0)
+    laneCenteringStatus = NumericProperty(0)
+    shifterPosition = NumericProperty(0)
+    yawRate = NumericProperty(0)
+    desiredVehiclePosition = NumericProperty(0)
+
+    def on_shifterPosition(self, instance, value):
+        HMIApp().switch()
 
 class HMIApp(App):
 
-    # settings
+    # user settings
     volume = StringProperty()
     ledBrightness = StringProperty()
     ledBrightnessEnabled = True
+
+    vehicleInfoClass = VehicleInfoClass()
+
+    # left lane settings
+    # distanceToLeftLane = NumericProperty()
+    # leftLaneCurvature = NumericProperty()
+    # leftLaneCurvatureDerivative = NumericProperty()
+    # leftLaneHeading = NumericProperty()
+
+    # # right lane settings
+    # distanceToRightLane = NumericProperty()
+    # rightLaneCurvature = NumericProperty()
+    # rightLaneCurvatureDerivative = NumericProperty()
+    # rightLaneHeading = NumericProperty()
 
     # when intro video should be paused and settings pop-up displayed
     SETTINGS_POPUP_TIME = 67
@@ -43,11 +73,13 @@ class HMIApp(App):
     settingsPopUpWindow = None
     congratsPopUpWindow = None
 
+    STORAGE_PATH = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+
     # screen manager
     sm = ScreenManager()
 
     # LED Strip
-    strip = LEDStrip()
+    # strip = LEDStrip()
 
     '''
     Begins playback of video
@@ -87,6 +119,47 @@ class HMIApp(App):
     def openPopUp(self, window):
         window.open()
 
+        
+    # switches screens based on shifter position
+    def switch(self):
+        # switch to dashboard if not in park
+        print('switching...')
+        if int(self.vehicleInfoClass.shifterPosition) != 0:
+            if self.sm.current == 'car_main_menu':
+                self.homeToDashboard()
+            elif self.sm.current == 'video':
+                self.videoToDashboard(False)
+            elif self.sm.current == 'intro_video':
+                self.videoToDashboard(True)
+            elif self.sm.current != 'dashboard':
+                self.toDashboard()
+        else:
+            self.dashboardToHome()
+
+    # receives input from mocked CAV
+    def receive(self):
+        receiver = Receiver('vcan0', True)
+        t = Thread(target=receiver.receive, daemon=True, name='can-receiver')
+        t.start()
+        while True: 
+            sleep(1)
+            vehicleInfo = receiver.getVehicleInfo()
+            # leftLaneA = receiver.getLeftLaneInfo()
+            # rightLaneA = receiver.getRightLaneInfo()
+
+            if (vehicleInfo is not None):
+                self.vehicleInfoClass.shifterPosition = vehicleInfo.shifter_position
+                print(vehicleInfo.shifter_position)
+
+    # thread starts receiver
+    def startReceiver(self):
+        print('before threading...')
+        print(type(self.ftdPopupWindow))
+        receiverThread = Thread(target=self.receive, daemon=True, name='can-receiver-starter')
+        receiverThread.start()
+        print('after threading...')
+        print(type(self.ftdPopupWindow))
+
     # schedules when to open settings pop up after intro video ends
     def openCongratsPopUpWindow(self, player):
         Clock.schedule_interval(lambda dt: self.pauseVideoAtTime(player, int(player.duration), self.congratsPopUpWindow), 1)
@@ -101,8 +174,8 @@ class HMIApp(App):
             return False
 
     # closes settings pop up and plays intro video
-    def closeSettingsPopUpWindow(self, video):
-        self.getPlayer(video).state = 'play'
+    def closeSettingsPopUpWindow(self, video, action):
+        self.getPlayer(video).state = action
         self.settingsPopUpWindow.dismiss()
 
     # closes congrats pop up and returns to main menu
@@ -110,6 +183,39 @@ class HMIApp(App):
         self.congratsPopUpWindow.dismiss()
         self.sm.transition.direction = 'right'
         self.sm.current = 'car_main_menu'
+
+    # switches from home to dashboard
+    def homeToDashboard(self):
+        print(type(self.ftdPopupWindow))
+        # if type(self.ftdPopupWindow) is not None:
+        #     self.closeFTDPopUpWindow() # close if open
+        self.toDashboard()
+
+    # switches from dashboard to home
+    def dashboardToHome(self):
+        self.sm.transition.direction = 'left'
+        self.sm.current = 'car_main_menu'
+
+    '''
+    switches from a video screen to dashboard
+    param intro: (boolean) if current screen is intro_video
+    '''
+    def videoToDashboard(self, intro):
+        video = 'intro_video' if intro else 'video' # get screen
+        self.getPlayer(video).state == 'stop' # stop video (also unschedules pop-up scheduler)
+
+        # close in case open
+        if intro:
+            self.closeSettingsPopUpWindow(video, 'stop')
+            self.closeCongratsPopUpWindow()
+
+        self.toDashboard()
+
+    # switches to dashboard
+    def toDashboard(self):
+        self.sm.transition.direction = 'right'
+        self.sm.current = 'dashboard'
+
 
     # get volume
     def getVolume(self):
@@ -153,12 +259,19 @@ class HMIApp(App):
         self.sm.add_widget(IntroVideoScreen(name='intro_video'))
 
         # open pop-up window
-        Clock.schedule_once(lambda dt: self.openPopUp(self.ftdPopupWindow), 2)
+        Clock.schedule_once(lambda dt: self.openPopUp(self.ftdPopupWindow), 0)
+
+        # start receiver
+        self.startReceiver()
+        print('started receiver***')
+
+        # self.vehicleInfoClass.bind(shifterPosition=lambda self, dt: self.switch())
 
         return self.sm
 
     # closes first time driver pop-up window
     def closeFTDPopUpWindow(self):
+        print(type(self.ftdPopupWindow))
         self.ftdPopupWindow.dismiss()
 
     '''
@@ -167,14 +280,14 @@ class HMIApp(App):
     '''
     def on_stop(self):
         data = ''
-        with open('storage.json') as f:
+        with open(os.path.join(self.STORAGE_PATH,'storage.json')) as f:
             data = json.load(f)
             f.close()
             data['control']['c_volume'] = self.volume
             data['control']['c_ledBrightness'] = self.ledBrightness
             data['control']['c_ledBrightnessEnabled'] = self.ledBrightnessEnabled
 
-        with open('storage.json', 'w') as f:
+        with open(os.path.join(self.STORAGE_PATH,'storage.json'), 'w') as f:
             json.dump(data, f)
             f.close()
 
@@ -182,7 +295,7 @@ class HMIApp(App):
     
     # Retrieves and stores settings in main memory
     def getSettings(self):
-        with open('storage.json') as f:
+        with open(os.path.join(self.STORAGE_PATH,'storage.json')) as f:
             data = json.load(f)
             f.close()
             
@@ -190,7 +303,7 @@ class HMIApp(App):
             self.volume = data['control']['c_volume']
             self.ledBrightness = data['control']['c_ledBrightness']
             self.ledBrightnessEnabled = data['control']['c_ledBrightnessEnabled']
-        
+
         # first time driver popup window
         self.ftdPopupWindow = Popup(title="First Time Driver", content=FTDPopUp(), size_hint=(None,None), size=(400,200), auto_dismiss=False)
     
@@ -199,6 +312,8 @@ class HMIApp(App):
 
         # congrats pop up window
         self.congratsPopUpWindow = Popup(title="Congratulations!", content=CongratsPopUp(), size_hint=(None,None), size=(400,200), auto_dismiss=False)
+
+        
 
     # Toggles colour of lane in dashboard
     def changeLaneColor(self, color):
@@ -210,11 +325,12 @@ class HMIApp(App):
 
     def playButtonTone(self):
         tone = SoundLoader.load('sounds/tone.mp3')
-        tone.volume = int(self.getVolume())/100
-        tone.play()
+        if tone:
+            tone.volume = int(self.getVolume())/100
+            tone.play()
 
 if __name__ == '__main__':
     HMIApp.title = "Lane Centering"
-    Window.fullscreen = True
+    # Window.fullscreen = True
     Window.size = (800,480)
     HMIApp().run()

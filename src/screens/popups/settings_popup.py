@@ -76,7 +76,7 @@ Builder.load_string("""
             pos_hint: {"x": 0.5, "y": 0.1}
             on_release:
                 app.playButtonTone()
-                app.closeSettingsPopUpWindow('intro_video')   
+                app.closeSettingsPopUpWindow('intro_video', 'play')   
 
 """)
 
