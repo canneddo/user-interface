@@ -3,7 +3,7 @@ from kivy.uix.screenmanager import ScreenManager
 from kivy.core.audio import SoundLoader
 from kivy.core.window import Window
 from kivy.clock import Clock
-from kivy.properties import NumericProperty, StringProperty
+from kivy.properties import NumericProperty, StringProperty, BooleanProperty
 from kivy.event import EventDispatcher
 from kivy.uix.popup import Popup
 
@@ -24,14 +24,40 @@ from screens.popups.ftd_popup import FTDPopUp
 from screens.popups.congrats_popup import CongratsPopUp
 
 import sys, os
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'Led-Module'))
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'LED-Module'))
 from LEDModuleLibraryV2 import LEDStrip
 
 from time import sleep
 from threading import Thread
 import json
 
-class VehicleInfoClass(EventDispatcher):
+# class VehicleInfoClass(EventDispatcher):
+#     # vehicle info settings
+#     vehicleOn = NumericProperty(0)
+#     leftLaneDetected = NumericProperty(0)
+#     rightLaneDetected = NumericProperty(0)
+#     laneCenteringStatus = NumericProperty(0)
+#     shifterPosition = NumericProperty(0)
+#     yawRate = NumericProperty(0)
+#     desiredVehiclePosition = NumericProperty(0)
+
+#     def __init__(self, app):
+#         print('init this class')
+#         self.app = app
+
+#     def on_shifterPosition(self, instance, value):
+#         print('we are switching')
+#         self.app.switch()
+
+class HMIApp(App, EventDispatcher):
+
+    # user settings
+    volume = StringProperty()
+    ledBrightness = StringProperty()
+    ledBrightnessEnabled = True
+
+    # vehicleInfoClass = None
+
     # vehicle info settings
     vehicleOn = NumericProperty(0)
     leftLaneDetected = NumericProperty(0)
@@ -40,18 +66,7 @@ class VehicleInfoClass(EventDispatcher):
     shifterPosition = NumericProperty(0)
     yawRate = NumericProperty(0)
     desiredVehiclePosition = NumericProperty(0)
-
-    def on_shifterPosition(self, instance, value):
-        HMIApp().switch()
-
-class HMIApp(App):
-
-    # user settings
-    volume = StringProperty()
-    ledBrightness = StringProperty()
-    ledBrightnessEnabled = True
-
-    vehicleInfoClass = VehicleInfoClass()
+    
 
     # left lane settings
     # distanceToLeftLane = NumericProperty()
@@ -69,9 +84,11 @@ class HMIApp(App):
     SETTINGS_POPUP_TIME = 67
 
     # popup windows
-    ftdPopupWindow = None
+    ftdPopupWindow = Popup(title="First Time Driver", content=FTDPopUp(), size_hint=(None,None), size=(400,200), auto_dismiss=False)
     settingsPopUpWindow = None
-    congratsPopUpWindow = None
+    congratsPopUpWindow = Popup(title="Congratulations!", content=CongratsPopUp(), size_hint=(None,None), size=(400,200), auto_dismiss=False)
+
+    shifted = BooleanProperty(False)
 
     STORAGE_PATH = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
@@ -80,6 +97,9 @@ class HMIApp(App):
 
     # LED Strip
     # strip = LEDStrip()
+
+    def on_shifterPosition(self, instance, value):
+        self.switch()
 
     '''
     Begins playback of video
@@ -107,6 +127,24 @@ class HMIApp(App):
             Clock.schedule_once(lambda dt: self.openSettingsPopUpWindow(player))
             Clock.schedule_once(lambda dt: self.openCongratsPopUpWindow(player))
 
+    def getFromDashboard(self, id):
+        return self.sm.get_screen('dashboard').ids[id]
+
+    def toggleLaneCentering(self, status):
+        objects = ['left_lane', 'right_lane', 'vehicle']
+        opacity = 1 if status == 1 else 0
+        for obj in objects:
+            self.getFromDashboard(obj).opacity = opacity
+
+    def laneDetected(self, side, detected):
+        self.getFromDashboard(side + '_lane').background_color = [0,1,0,1] if detected == 1 else [1,1,1,1]
+
+    # def displayedMessage(self, status):
+    #     labels = ['labelInactive', 'labelActive', 'labelInactive', 'labelConnectionLost']
+    #     for label in labels:
+
+    #         self.getFromDashboard(label).opacity = opacity
+
     # returns player
     def getPlayer(self, video):
         return self.sm.get_screen(video).ids[video + '_player']
@@ -124,7 +162,7 @@ class HMIApp(App):
     def switch(self):
         # switch to dashboard if not in park
         print('switching...')
-        if int(self.vehicleInfoClass.shifterPosition) != 0:
+        if int(self.shifterPosition) != 0:
             if self.sm.current == 'car_main_menu':
                 self.homeToDashboard()
             elif self.sm.current == 'video':
@@ -148,8 +186,8 @@ class HMIApp(App):
             # rightLaneA = receiver.getRightLaneInfo()
 
             if (vehicleInfo is not None):
-                self.vehicleInfoClass.shifterPosition = vehicleInfo.shifter_position
-                print(vehicleInfo.shifter_position)
+                self.shifterPosition = vehicleInfo.shifter_position
+                print(self.getLane('left'))
 
     # thread starts receiver
     def startReceiver(self):
@@ -186,9 +224,9 @@ class HMIApp(App):
 
     # switches from home to dashboard
     def homeToDashboard(self):
-        print(type(self.ftdPopupWindow))
+        # print(type(self.ftdPopupWindow))
         # if type(self.ftdPopupWindow) is not None:
-        #     self.closeFTDPopUpWindow() # close if open
+        self.closeFTDPopUpWindow() # close if open
         self.toDashboard()
 
     # switches from dashboard to home
@@ -305,13 +343,14 @@ class HMIApp(App):
             self.ledBrightnessEnabled = data['control']['c_ledBrightnessEnabled']
 
         # first time driver popup window
-        self.ftdPopupWindow = Popup(title="First Time Driver", content=FTDPopUp(), size_hint=(None,None), size=(400,200), auto_dismiss=False)
+        #self.ftdPopupWindow = Popup(title="First Time Driver", content=FTDPopUp(), size_hint=(None,None), size=(400,200), auto_dismiss=False)
     
         # settings pop up window
         self.settingsPopUpWindow = Popup(title="Change Lane Centering settings below", content=SettingsPopUp(), size_hint=(None,None), size=(600,300), auto_dismiss=False)
 
+        # self.vehicleInfoClass = VehicleInfoClass(self)
         # congrats pop up window
-        self.congratsPopUpWindow = Popup(title="Congratulations!", content=CongratsPopUp(), size_hint=(None,None), size=(400,200), auto_dismiss=False)
+        # self.congratsPopUpWindow = Popup(title="Congratulations!", content=CongratsPopUp(), size_hint=(None,None), size=(400,200), auto_dismiss=False)
 
         
 
@@ -328,6 +367,7 @@ class HMIApp(App):
         if tone:
             tone.volume = int(self.getVolume())/100
             tone.play()
+
 
 if __name__ == '__main__':
     HMIApp.title = "Lane Centering"
