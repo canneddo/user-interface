@@ -59,12 +59,10 @@ class HMIApp(App, EventDispatcher):
     # vehicleInfoClass = None
 
     # vehicle info settings
-    vehicleOn = NumericProperty(0)
     leftLaneDetected = NumericProperty(0)
     rightLaneDetected = NumericProperty(0)
     laneCenteringStatus = NumericProperty(0)
     shifterPosition = NumericProperty(0)
-    yawRate = NumericProperty(0)
     desiredVehiclePosition = NumericProperty(0)
     
 
@@ -101,6 +99,17 @@ class HMIApp(App, EventDispatcher):
     def on_shifterPosition(self, instance, value):
         self.switch()
 
+    def on_leftLaneDetected(self, instance, value):
+        self.laneDetected('left', int(self.leftLaneDetected))
+
+    def on_rightLaneDetected(self, instance, value):
+        self.laneDetected('right', int(self.rightLaneDetected))
+
+    def on_laneCenteringStatus(self, instance, value):
+        status = int(self.laneCenteringStatus)
+        self.toggleLaneCentering(status)
+        self.displayedMessage(status)
+
     '''
     Begins playback of video
     @param intro: True if intro video, False if accessed from menu
@@ -127,23 +136,54 @@ class HMIApp(App, EventDispatcher):
             Clock.schedule_once(lambda dt: self.openSettingsPopUpWindow(player))
             Clock.schedule_once(lambda dt: self.openCongratsPopUpWindow(player))
 
+    # gets object from dashboard using id
     def getFromDashboard(self, id):
         return self.sm.get_screen('dashboard').ids[id]
 
+    '''
+    lane centering display (car and 2 lanes)
+    param: status: 0 or 2(inactive), 1(active), 3(error)
+    displays only when status is 1
+    '''
     def toggleLaneCentering(self, status):
         objects = ['left_lane', 'right_lane', 'vehicle']
         opacity = 1 if status == 1 else 0
         for obj in objects:
             self.getFromDashboard(obj).opacity = opacity
 
+    '''
+    lanes detected
+    param: side (left or right)
+    param: detected (0 or 1)
+    selected lane becomes green if detected is 1
+    '''
     def laneDetected(self, side, detected):
         self.getFromDashboard(side + '_lane').background_color = [0,1,0,1] if detected == 1 else [1,1,1,1]
 
-    # def displayedMessage(self, status):
-    #     labels = ['labelInactive', 'labelActive', 'labelInactive', 'labelConnectionLost']
-    #     for label in labels:
+    '''
+    which message to display
+    param: status: 0 or 2(inactive), 1(active), 3(error)
+    '''
+    def displayedMessage(self, status):
+        # list of labels
+        labels = ['labelInactive', 'labelActive', 'labelConnectionLost']
 
-    #         self.getFromDashboard(label).opacity = opacity
+        # get label objects
+        objects = list(map(lambda label: self.getFromDashboard(label), labels))
+
+        # conceal all labels
+        for obj in objects:
+            obj.opacity = 0
+        
+        # get correct index (2 is same as 0 since it is unused)
+        index = 0
+        if status == 1:
+            index = 1
+        elif status == 3:
+            index = 2
+
+        # use appropriate index to target which label to display
+        objects[index].opacity = 1
 
     # returns player
     def getPlayer(self, video):
@@ -187,7 +227,9 @@ class HMIApp(App, EventDispatcher):
 
             if (vehicleInfo is not None):
                 self.shifterPosition = vehicleInfo.shifter_position
-                print(self.getLane('left'))
+                self.leftLaneDetected = vehicleInfo.lane_left_detected
+                self.rightLaneDetected = vehicleInfo.lane_right_detected
+                self.laneCenteringStatus = vehicleInfo.lane_centering_status
 
     # thread starts receiver
     def startReceiver(self):
