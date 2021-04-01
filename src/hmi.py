@@ -64,6 +64,7 @@ class HMIApp(App, EventDispatcher):
     rightLaneDetected = NumericProperty(0)
     laneCenteringStatus = NumericProperty(0)
     shifterPosition = NumericProperty(0)
+    vehiclePosition = NumericProperty(0)
     yawRate = NumericProperty(0)
     desiredVehiclePosition = NumericProperty(0)
     
@@ -96,10 +97,15 @@ class HMIApp(App, EventDispatcher):
     sm = ScreenManager()
 
     # LED Strip
-    # strip = LEDStrip()
+    strip = LEDStrip()
+    strip.change_brightness(i**2)
 
     def on_shifterPosition(self, instance, value):
         self.switch()
+
+    def on_vehiclePosition(self, instance, value):
+        pos, laneWidth = strip.vehicle_position_conversion(distFromLeft, distFromRight)
+        strip.direction_to_travel(pos, laneWidth)
 
     '''
     Begins playback of video
@@ -182,12 +188,15 @@ class HMIApp(App, EventDispatcher):
         while True: 
             sleep(1)
             vehicleInfo = receiver.getVehicleInfo()
-            # leftLaneA = receiver.getLeftLaneInfo()
-            # rightLaneA = receiver.getRightLaneInfo()
+            leftLaneA = receiver.getLeftLaneInfo()
+            rightLaneA = receiver.getRightLaneInfo()
 
             if (vehicleInfo is not None):
                 self.shifterPosition = vehicleInfo.shifter_position
                 print(self.getLane('left'))
+            
+            if((leftLaneA is not None) and (rightLaneA is not None)):
+                self.vehiclePosition = leftLaneA.distance_to_lane - rightLaneA.distance_to_lane
 
     # thread starts receiver
     def startReceiver(self):
