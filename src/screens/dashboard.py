@@ -12,19 +12,19 @@ Builder.load_string("""
             Label:
                 id: labelActive
                 text: "Lane Centering Active"                
-                font_size: 30
+                font_size: 40
                 color: "green"
                 opacity: 0
             Label:
                 id: labelInactive
                 text: "Lane Centering Inactive"
-                font_size: 30
+                font_size: 40
                 color: "yellow"
-                opacity: 1
+                opacity: 0
             Label:
                 id: labelConnectionLost
                 text: "Error: \\nLane Centering has been compromised,\\ncontinue driving normally."
-                font_size: 30
+                font_size: 40
                 color: "red"
                 opacity: 0
         

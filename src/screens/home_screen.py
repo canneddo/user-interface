@@ -52,13 +52,6 @@ Builder.load_string("""
         Image:
             source: '{6}'
             size_hint: 0.2,0.2
-        Button:
-            size_hint: 0.2,0.2
-            text: 'Shift out of Park'
-            on_press:
-                app.playButtonTone()
-                root.manager.transition.direction = 'right' 
-                root.manager.current = 'dashboard'
 """.format(*image_paths))
 
 class CarHomeScreen(Screen):

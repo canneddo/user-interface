@@ -23,7 +23,7 @@ Builder.load_string("""
         pos_hint: {"x":0.1, "y": 0.1}
         on_release:
             app.playButtonTone()
-            app.closeFTDPopUpWindow()
+            app.closeFTDPopUpWindow(False)
             
 
     Button:
