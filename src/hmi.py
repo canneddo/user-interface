@@ -26,7 +26,7 @@ from screens.popups.congrats_popup import CongratsPopUp
 
 import sys, os
 # sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'LED-Module'))
-# from LEDModuleLibraryV2 import LEDStrip
+from LEDModuleLibraryV2 import LEDStrip
 
 from time import sleep
 from threading import Thread
@@ -44,6 +44,8 @@ class HMIApp(App):
     rightLaneDetected = NumericProperty(0)
     laneCenteringStatus = NumericProperty(0)
     shifterPosition = NumericProperty(0)
+    distanceToLeftLane = NumericProperty(0)
+    distanceToRightLane = NumericProperty(0)
     vehiclePosition = NumericProperty(0)
     yawRate = NumericProperty(0)
     desiredVehiclePosition = NumericProperty(0)
@@ -82,8 +84,8 @@ class HMIApp(App):
     sm = ScreenManager()
 
     # LED Strip
-    # strip = LEDStrip()
-    # strip.change_brightness(i**2)
+    strip = LEDStrip()
+    strip.change_brightness(255)
 
     def on_shifterPosition(self, instance, value):
         self.switch()
@@ -103,8 +105,8 @@ class HMIApp(App):
         self.shutDownAppOnError(status)
         
     def on_vehiclePosition(self, instance, value):
-        pos, laneWidth = strip.vehicle_position_conversion(distFromLeft, distFromRight)
-        strip.direction_to_travel(pos, laneWidth)
+        pos, laneWidth = self.strip.vehicle_position_conversion(self.distanceToLeftLane, self.distanceToRightLane)
+        self.strip.direction_to_travel(pos, laneWidth)
 
     '''
     Begins playback of video
@@ -241,7 +243,9 @@ class HMIApp(App):
                 self.laneCenteringStatus = vehicleInfo.lane_centering_status
             
             if((leftLaneA is not None) and (rightLaneA is not None)):
-                self.vehiclePosition = leftLaneA.distance_to_lane - rightLaneA.distance_to_lane
+            	self.distanceToLeftLane = leftLaneA.distance_to_lane
+            	self.distanceToRightLane = rightLaneA.distance_to_lane
+            	self.vehiclePosition = leftLaneA.distance_to_lane - rightLaneA.distance_to_lane
 
     # thread starts receiver
     def startReceiver(self):
