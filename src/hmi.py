@@ -92,21 +92,31 @@ class HMIApp(App):
 
     def on_leftLaneDetected(self, instance, value):
         self.laneDetected('left', int(self.leftLaneDetected))
+        self.updateLanePositionStrip()
         self.displayedMessage(int(self.laneCenteringStatus))
 
     def on_rightLaneDetected(self, instance, value):
         self.laneDetected('right', int(self.rightLaneDetected))
+        self.updateLanePositionStrip()
         self.displayedMessage(int(self.laneCenteringStatus))
 
     def on_laneCenteringStatus(self, instance, value):
         status = int(self.laneCenteringStatus)
+        self.updateLanePositionStrip()
+            
         self.toggleLaneCentering(status)
         self.displayedMessage(status)
         self.shutDownAppOnError(status)
         
     def on_vehiclePosition(self, instance, value):
-        pos, laneWidth = self.strip.vehicle_position_conversion(self.distanceToLeftLane, self.distanceToRightLane)
-        self.strip.direction_to_travel(pos, laneWidth)
+        self.updateLanePositionStrip()
+
+    def updateLanePositionStrip(self):
+        if int(self.laneCenteringStatus == 1 and self.leftLaneDetected) == 1 and int(self.rightLaneDetected) == 1:
+            pos, laneWidth = self.strip.vehicle_position_conversion(self.distanceToLeftLane, self.distanceToRightLane)
+            self.strip.direction_to_travel(pos, laneWidth)
+        else:
+            self.strip.colour_wipe(0)
 
     '''
     Begins playback of video
@@ -258,16 +268,20 @@ class HMIApp(App):
 
     # pauses videoplayer at timestamp and opens pop-up window
     def pauseVideoAtTime(self, player, timestamp, window):
-        if (int(player.position) >= timestamp):
-            player.state = 'pause'
-            self.openPopUp(window)
-            return False
-        elif (player.state == 'stop'):
+    	if (int(player.position) >= timestamp):
+    	    player.state = 'pause'
+    	    self.openPopUp(window)
+    	    if window == self.settingsPopUpWindow:
+                pos, laneWidth = self.strip.vehicle_position_conversion(self.distanceToLeftLane, self.distanceToRightLane)
+                self.strip.direction_to_travel(pos, laneWidth)
+    	    return False
+    	elif (player.state == 'stop'):
             return False
 
     # closes settings pop up and plays intro video
     def closeSettingsPopUpWindow(self, video, action):
         self.getPlayer(video).state = action
+        self.strip.colour_wipe(0)
         self.settingsPopUpWindow.dismiss()
 
     # closes congrats pop up and returns to main menu
@@ -392,7 +406,7 @@ class HMIApp(App):
             popup = self.newDriverPopUpWindow
         else:
             popup = self.returningDriverPopUpWindow
-
+	
         popup.open()
         Clock.schedule_once(lambda dt: popup.dismiss(), 2)
         return
