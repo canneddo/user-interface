@@ -27,7 +27,7 @@ from screens.popups.congrats_popup import CongratsPopUp
 import sys, os
 # sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'LED-Module'))
 from LEDModuleLibraryV2 import LEDStrip
-
+from enum import Enum, auto
 from time import sleep
 from threading import Thread
 import json
@@ -92,26 +92,20 @@ class HMIApp(App):
 
     def on_leftLaneDetected(self, instance, value):
         self.laneDetected('left', int(self.leftLaneDetected))
-        self.updateLanePositionStrip()
         self.displayedMessage(int(self.laneCenteringStatus))
 
     def on_rightLaneDetected(self, instance, value):
         self.laneDetected('right', int(self.rightLaneDetected))
-        self.updateLanePositionStrip()
         self.displayedMessage(int(self.laneCenteringStatus))
 
     def on_laneCenteringStatus(self, instance, value):
         status = int(self.laneCenteringStatus)
-        self.updateLanePositionStrip()
             
         self.toggleLaneCentering(status)
         self.displayedMessage(status)
         self.shutDownAppOnError(status)
         
     def on_vehiclePosition(self, instance, value):
-        self.updateLanePositionStrip()
-
-    def updateLanePositionStrip(self):
         if int(self.laneCenteringStatus == 1 and self.leftLaneDetected) == 1 and int(self.rightLaneDetected) == 1:
             pos, laneWidth = self.strip.vehicle_position_conversion(self.distanceToLeftLane, self.distanceToRightLane)
             self.strip.direction_to_travel(pos, laneWidth)
@@ -183,6 +177,7 @@ class HMIApp(App):
     param: status: 0 or 2(inactive), 1(active), 3(error)
     '''
     def displayedMessage(self, status):
+    
         # list of labels
         labels = ['labelInactive', 'labelActive', 'labelConnectionLost']
 
@@ -197,10 +192,25 @@ class HMIApp(App):
         index = None
         if status == 1:
             if int(self.leftLaneDetected) == 1 and int(self.rightLaneDetected) == 1:
+                pos, laneWidth = self.strip.vehicle_position_conversion(self.distanceToLeftLane, self.distanceToRightLane)
+                self.strip.direction_to_travel(pos, laneWidth)
+                
+                self.playTone(self.Sound.ACTIVE)
+                
                 index = 1
+                
             else:
+                self.strip.colour_wipe(0)
+                
+                self.playTone(self.Sound.INACTIVE)
+                
                 index = 0
+                
         elif status == 3:
+            self.strip.colour_wipe(0)
+            
+            self.playTone(self.Sound.ERROR)
+            
             index = 2
 
         # use appropriate index to target which label to display
@@ -271,6 +281,7 @@ class HMIApp(App):
     	if (int(player.position) >= timestamp):
     	    player.state = 'pause'
     	    self.openPopUp(window)
+    	    self.playTone(self.Sound.POPUP)
     	    if window == self.settingsPopUpWindow:
                 pos, laneWidth = self.strip.vehicle_position_conversion(self.distanceToLeftLane, self.distanceToRightLane)
                 self.strip.direction_to_travel(pos, laneWidth)
@@ -453,11 +464,30 @@ class HMIApp(App):
         return [1,1,1,1]
 
     def playButtonTone(self):
-        tone = SoundLoader.load('sounds/tone.mp3')
+        tone = SoundLoader.load('sounds/button_click.mp3')
         if tone:
             tone.volume = int(self.getVolume())/100
             tone.play()
-
+            
+    class Sound(Enum):
+        CLICK = auto()
+        POPUP = auto()
+        ACTIVE = auto()
+        INACTIVE = auto()
+        ERROR = auto()
+    
+    def playTone(self, sound):
+        selected = {
+            self.Sound.CLICK: "sounds/button_35.mp3",
+            self.Sound.POPUP: "sounds/tone.mp3",
+            self.Sound.ACTIVE: "sounds/lane_centering_active.mp3",
+            self.Sound.INACTIVE: "sounds/lane_centering_inactive.mp3",
+            self.Sound.ERROR: "sounds/lane_centering_error.mp3"
+        }
+        tone = SoundLoader.load(selected.get(sound, "sounds/tone.mp3"))
+        if tone:
+            tone.volume = int(self.getVolume())/100
+            tone.play()
 
 if __name__ == '__main__':
     HMIApp.title = "Lane Centering"

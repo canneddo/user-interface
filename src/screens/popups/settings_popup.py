@@ -26,7 +26,7 @@ Builder.load_string("""
                 font_size: 60
                 on_release:
                     app.setVolume(int(volumeVal.text) - 5 if int(volumeVal.text) > 0 else int(volumeVal.text))                    
-                    app.playButtonTone()  
+                    app.playTone(app.Sound.CLICK)  
             Label:
                 id: volumeVal
                 text: app.volume
@@ -37,7 +37,7 @@ Builder.load_string("""
                 font_size: 60
                 on_release:
                     app.setVolume(int(volumeVal.text) + 5 if int(volumeVal.text) < 100 else int(volumeVal.text))                    
-                    app.playButtonTone()
+                    app.playTone(app.Sound.CLICK)
 
             Label:
                 text: "LED \\nBrightness"
@@ -54,7 +54,7 @@ Builder.load_string("""
                 font_size: 60
                 on_release:
                     app.setLedBrightness(int(ledBrightnessVal.text) - 5 if int(ledBrightnessVal.text) > 0 else 0)                    
-                    app.playButtonTone()  
+                    app.playTone(app.Sound.CLICK)  
             Label:
                 id: ledBrightnessVal
                 text: app.ledBrightness
@@ -66,7 +66,7 @@ Builder.load_string("""
                 font_size: 60
                 on_release:
                     app.setLedBrightness(int(ledBrightnessVal.text) + 5 if int(ledBrightnessVal.text) < 100 else 100)
-                    app.playButtonTone()
+                    app.playTone(app.Sound.CLICK)
     
         
         Button:
@@ -75,7 +75,7 @@ Builder.load_string("""
             size_hint_y: 0.4
             pos_hint: {"x": 0.5, "y": 0.1}
             on_release:
-                app.playButtonTone()
+                app.playTone(app.Sound.CLICK)
                 app.closeSettingsPopUpWindow('intro_video', 'play')   
 
 """)

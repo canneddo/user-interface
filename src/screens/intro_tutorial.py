@@ -15,7 +15,7 @@ Builder.load_string("""
             width: '192dp'
             text: 'Skip'
             on_press:
-                app.playButtonTone()
+                app.playTone(app.Sound.CLICK)
                 intro_video_player.state = 'stop'
                 root.manager.transition.direction = 'right' 
                 root.manager.current = 'car_main_menu'
