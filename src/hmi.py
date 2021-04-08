@@ -85,7 +85,6 @@ class HMIApp(App):
 
     # LED Strip
     strip = LEDStrip()
-    strip.change_brightness(255)
 
     def on_shifterPosition(self, instance, value):
         self.switch()
