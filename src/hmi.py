@@ -27,6 +27,8 @@ from screens.popups.congrats_popup import CongratsPopUp
 import sys, os
 # sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'LED-Module'))
 from LEDModuleLibraryV2 import LEDStrip
+from rpi_ws281x import Color
+
 from enum import Enum, auto
 from time import sleep
 from threading import Thread
@@ -52,16 +54,16 @@ class HMIApp(App):
     
 
     # left lane settings
-    # distanceToLeftLane = NumericProperty()
-    # leftLaneCurvature = NumericProperty()
-    # leftLaneCurvatureDerivative = NumericProperty()
-    # leftLaneHeading = NumericProperty()
+   # distanceToLeftLane = NumericProperty()
+   # leftLaneCurvature = NumericProperty()
+   # leftLaneCurvatureDerivative = NumericProperty()
+   # leftLaneHeading = NumericProperty()
 
-    # # right lane settings
-    # distanceToRightLane = NumericProperty()
-    # rightLaneCurvature = NumericProperty()
-    # rightLaneCurvatureDerivative = NumericProperty()
-    # rightLaneHeading = NumericProperty()
+    # right lane settings
+   # distanceToRightLane = NumericProperty()
+   # rightLaneCurvature = NumericProperty()
+   # rightLaneCurvatureDerivative = NumericProperty()
+   # rightLaneHeading = NumericProperty()
 
     # when intro video should be paused and settings pop-up displayed
     SETTINGS_POPUP_TIME = 67
@@ -109,7 +111,7 @@ class HMIApp(App):
             pos, laneWidth = self.strip.vehicle_position_conversion(self.distanceToLeftLane, self.distanceToRightLane)
             self.strip.direction_to_travel(pos, laneWidth)
         else:
-            self.strip.colour_wipe(0)
+            self.strip.colour_wipe(Color(0,0,0))
 
     '''
     Begins playback of video
@@ -199,14 +201,14 @@ class HMIApp(App):
                 index = 1
                 
             else:
-                self.strip.colour_wipe(0)
+                self.strip.colour_wipe(Color(0,0,0))
                 
                 self.playTone(self.Sound.INACTIVE)
                 
                 index = 0
                 
         elif status == 3:
-            self.strip.colour_wipe(0)
+            self.strip.colour_wipe(Color(0,0,0))
             
             self.playTone(self.Sound.ERROR)
             
@@ -246,7 +248,7 @@ class HMIApp(App):
 
     # receives input from mocked CAV
     def receive(self):
-        receiver = Receiver('vcan0', True)
+        receiver = Receiver('can0')
         t = Thread(target=receiver.receive, daemon=True, name='can-receiver')
         t.start()
         while True: 
@@ -291,7 +293,7 @@ class HMIApp(App):
     # closes settings pop up and plays intro video
     def closeSettingsPopUpWindow(self, video, action):
         self.getPlayer(video).state = action
-        self.strip.colour_wipe(0)
+        self.strip.colour_wipe(Color(0,0,0))
         self.settingsPopUpWindow.dismiss()
 
     # closes congrats pop up and returns to main menu
@@ -426,6 +428,7 @@ class HMIApp(App):
     Saves system state
     '''
     def on_stop(self):
+        self.strip.colour_wipe(Color(0,0,0))
         data = ''
         with open(os.path.join(self.STORAGE_PATH,'storage.json')) as f:
             data = json.load(f)
@@ -490,6 +493,6 @@ class HMIApp(App):
 
 if __name__ == '__main__':
     HMIApp.title = "Lane Centering"
-    # Window.fullscreen = True
+    Window.fullscreen = True
     Window.size = (800,480)
     HMIApp().run()
