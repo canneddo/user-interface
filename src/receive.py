@@ -47,8 +47,10 @@ class Receiver():
             recvmsg = self._can_bus.recv() #received message
             arbitrationID = recvmsg.arbitration_id
             if arbitrationID == 0x000 or arbitrationID == 0x001 or arbitrationID == 0x002:
-                decoded = self._db.decode_message(recvmsg.arbitration_id, recvmsg.data) # decoded dictionary object
-            #print(decoded)
+                try:
+                    decoded = self._db.decode_message(recvmsg.arbitration_id, recvmsg.data) # decoded dictionary object
+                except Exception as e:
+                    print("An exception occured when decoding CAN message: " + str(e))
 
                 # store into appropriate message object type
                 if arbitrationID == self._vehicleInfoDef.frame_id:
@@ -57,23 +59,3 @@ class Receiver():
                     self._leftLaneA = Left_Lane_A(self._leftLaneADef, decoded)
                 elif arbitrationID == self._rightLaneADef.frame_id:
                     self._rightLaneA = Right_Lane_A(self._rightLaneADef, decoded)
-            
-
-
-
-# if __name__ == '__main__':
-#     receiver = Receiver('vcan0', True)
-#     t = Thread(target=receiver.receive, daemon=True)
-#     t.start()
-#     while True: 
-#         time.sleep(1)
-#         # vehicleInfo = receiver.getVehicleInfo()
-#         # # leftLane = receiver.getLeftLaneInfo()
-#         # # rightLane = receiver.getRightLaneInfo()
-#         # if vehicleInfo is not None and leftLane is not None and rightLane is not None:
-#         #     print(vehicleInfo.name)
-#         #     print(leftLane.name)
-#         #     print(rightLane.name)
-
-    
-
