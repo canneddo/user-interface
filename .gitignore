@@ -1,1 +1,2 @@
-cav-ui-mock-input/__pycache__*
+/cav-ui-mock-input/__pycache__
+/src/**/__pycache__

@@ -17,7 +17,7 @@ Builder.load_string("""
                 size: root.width * 0.2, root.height * 0.2
                 size_hint: None, None
                 on_press:
-                    app.playButtonTone()
+                    app.playTone(app.Sound.CLICK)
                     root.manager.transition.direction = 'right' 
                     root.manager.current = 'menu'
                 
@@ -41,7 +41,7 @@ Builder.load_string("""
                 text: "-"
                 font_size: 60
                 on_release:
-                    app.playButtonTone()
+                    app.playTone(app.Sound.CLICK)
                     app.setVolume(int(volumeVal.text) - 5 if int(volumeVal.text) > 0 else int(volumeVal.text))  
             Label:
                 id: volumeVal
@@ -52,7 +52,7 @@ Builder.load_string("""
                 text: "+"
                 font_size: 60
                 on_release:
-                    app.playButtonTone()
+                    app.playTone(app.Sound.CLICK)
                     app.setVolume(int(volumeVal.text) + 5 if int(volumeVal.text) < 100 else int(volumeVal.text))
 
             Label:
@@ -62,7 +62,7 @@ Builder.load_string("""
                 id: led_brightness_active
                 active: app.ledBrightnessEnabled
                 on_release:
-                    app.playButtonTone()
+                    app.playTone(app.Sound.CLICK)
                     app.enableLedBrightness(led_brightness_active.active)
             Button:
                 id: led_brightness_down
@@ -70,7 +70,7 @@ Builder.load_string("""
                 text: "-"
                 font_size: 60
                 on_release:
-                    app.playButtonTone()
+                    app.playTone(app.Sound.CLICK)
                     app.setLedBrightness(int(ledBrightnessVal.text) - 5 if int(ledBrightnessVal.text) > 0 else 0)  
             Label:
                 id: ledBrightnessVal
@@ -82,7 +82,7 @@ Builder.load_string("""
                 text: "+"
                 font_size: 60
                 on_release:
-                    app.playButtonTone()
+                    app.playTone(app.Sound.CLICK)
                     app.setLedBrightness(int(ledBrightnessVal.text) + 5 if int(ledBrightnessVal.text) < 100 else 100)
 
         
