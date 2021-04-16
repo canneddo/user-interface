@@ -6,22 +6,22 @@
     padding: 5
     on_lane_centering_status: InputHandler.update_input('lane_centering_status', self.lane_centering_status)
     Label:
-        text: 'Lane centering status\nlane_centering_status'
+        text: 'Lane Centering Status'
         height: 50
         size_hint_y: None
     GridLayout:
         cols: 2
         rows: 2
         Button:
-            text: '0'
+            text: 'Off'
             on_press: root.status_button_press(0, self)
             background_color: root.button_colors['green']
         Button:
-            text: '1'
+            text: 'On'
             on_press: root.status_button_press(1, self)
         Button:
-            text: '2'
+            text: '-'
             on_press: root.status_button_press(2, self)
         Button:
-            text: '3'
+            text: 'Err'
             on_press: root.status_button_press(3, self)

@@ -4,17 +4,17 @@
     orientation: 'vertical'
     on_left_lane_detected: InputHandler.update_input('lane_left_detected', int(self.left_lane_detected))
     on_right_lane_detected:  InputHandler.update_input('lane_right_detected', int(self.right_lane_detected))
-    LaneCanvas:
+    LanePlot:
         size_hint: (None, 6)
     GridLayout:
         cols: 2
         Button:
-            text: 'Detect left lane\nlane_left_detected'
+            text: 'Detect Left Lane'
             height: 50
             size_hint_y: None
             on_press: root.lane_detector_press(0, self)
         Button:
-            text: 'Detect right lane\nlane_right_detected'
+            text: 'Detect Right Lane'
             height: 50
             size_hint_y: None
             on_press: root.lane_detector_press(1, self)

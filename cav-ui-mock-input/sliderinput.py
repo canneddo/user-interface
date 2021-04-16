@@ -8,7 +8,7 @@ from kivy.clock import Clock
 class SliderInput(BoxLayout):
     direction = StringProperty('horizontal')
     labelwidth = NumericProperty(50)
-    sliderwidth = NumericProperty(300)
+    sliderwidth = NumericProperty(50)
     textinputwidth = NumericProperty(50)
     labeltext = StringProperty()
     value = NumericProperty(0)
@@ -39,8 +39,8 @@ class SliderInput(BoxLayout):
         self.add_widget(label); self.add_widget(self.slider); self.add_widget(self.textinput)
 
     def slider_update(self, _, value):
-        self.value = value
-        self.textinput.text = str(value)
+        self.value = round(value,5)
+        self.textinput.text = str(self.value)
 
     def on_textinput_focus(self, textinput, focus):
         if (focus is True):
