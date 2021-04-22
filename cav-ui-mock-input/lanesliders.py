@@ -11,10 +11,11 @@ slider_input_params = [
     { 'value_min': -0.35, 'value_max': 0.35, 'step': 0.05 },
     { 'value_min': -3, 'value_max': 3, 'step': 0.1 }
 ]
-labels = [ 'Lane Curvature Derivative', 
-           'Lane Curvature', 
-           'Lane Heading', 
+labels = [ 'Lane Curvature Derivative',
+           'Lane Curvature',
+           'Lane Heading',
            'Distance to Lane' ]
+label_widths = [200, 130, 130, 150]
 
 class LaneSliders(BoxLayout):
     label =  StringProperty()
@@ -41,7 +42,7 @@ class LaneSliders(BoxLayout):
         for i in range(4):
             params = slider_input_params[i]
             labeltext = labels[i]
-            slider = SliderInput(**params, labeltext=labeltext, labelwidth= 120, direction='vertical')
+            slider = SliderInput(**params, labeltext=labeltext, labelwidth=label_widths[i], direction='vertical')
             slider.bind(value=self.on_update_slider_input)
             self.add_widget(slider)
             self.add_widget(Widget())
