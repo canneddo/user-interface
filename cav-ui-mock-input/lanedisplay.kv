@@ -1,11 +1,13 @@
 #:kivy 1.0
-<LaneCanvas>
+
+#:include laneplot.kv
+
 <LaneDisplay>
     orientation: 'vertical'
     on_left_lane_detected: InputHandler.update_input('lane_left_detected', int(self.left_lane_detected))
     on_right_lane_detected:  InputHandler.update_input('lane_right_detected', int(self.right_lane_detected))
     LanePlot:
-        size_hint: (None, 6)
+        size_hint_y: 6
     GridLayout:
         cols: 2
         Button:

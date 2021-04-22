@@ -36,8 +36,11 @@ class LaneSliders(BoxLayout):
         elif (slider.labeltext.endswith(labels[3])):
             index = 3
         self.lane_parameters[index] = value
+        self.lane_plot.update_plot(self.lane_plot_label, *self.lane_parameters)
 
     def add_widgets(self, _):
+        self.lane_plot_label = 'left' if 'Left' in self.lane_name else 'right'
+        self.lane_plot = self.parent.children[1].children[1]
         self.children[-1].text = self.label
         for i in range(4):
             params = slider_input_params[i]

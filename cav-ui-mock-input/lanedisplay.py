@@ -16,7 +16,6 @@ class LaneDisplay(BoxLayout):
     def lane_detector_press(self, lane, button):
         lane_property = ''
         button_text = ''
-        self.lane_plot = LanePlot()
 
         if (lane == 0):
             button_text = self.lane_centering_button_text[0]
